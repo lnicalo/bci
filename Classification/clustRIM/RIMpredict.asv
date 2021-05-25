@@ -1,0 +1,9 @@
+function [accuracy, predictlabel, score] = RIMpredict(fea, gnd, model)
+
+    N = size(fea,1);
+    K = model.fea*fea';
+    
+    D = 1./(1+exp(-(model.alphas*K + repmat(model.bs,[1 N]))));    
+    [score predictlabel] = max(D,[],1);
+    accuracy = mean(predictlabel ~= gnd);
+end

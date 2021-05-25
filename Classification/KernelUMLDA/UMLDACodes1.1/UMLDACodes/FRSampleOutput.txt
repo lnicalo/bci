@@ -1,0 +1,28 @@
+You should get similar results when running "demoRUMLDAAggr".
+The results won't be identical because random initialization is involved.
+However, the deviation should be small (around 2%).
+-------------------------------------------------------
+Processing FERETC80A45S6/FERETC80A45S6_32x32
+Performning R-UMLDA learning
+R-UMLDA learning is done
+The best recognition rate for combining 1 learners is: 62.303%
+The best recognition rate for combining 2 learners is: 64.9697%
+The best recognition rate for combining 3 learners is: 69.2121%
+The best recognition rate for combining 4 learners is: 71.8788%
+The best recognition rate for combining 5 learners is: 72.8485%
+The best recognition rate for combining 6 learners is: 75.0303%
+The best recognition rate for combining 7 learners is: 74.1818%
+The best recognition rate for combining 8 learners is: 74.4242%
+The best recognition rate for combining 9 learners is: 74.0606%
+The best recognition rate for combining 10 learners is: 75.1515%
+The best recognition rate for combining 11 learners is: 76.1212%
+The best recognition rate for combining 12 learners is: 76.1212%
+The best recognition rate for combining 13 learners is: 75.3939%
+The best recognition rate for combining 14 learners is: 75.7576%
+The best recognition rate for combining 15 learners is: 75.5152%
+The best recognition rate for combining 16 learners is: 75.2727%
+The best recognition rate for combining 17 learners is: 75.0303%
+The best recognition rate for combining 18 learners is: 74.9091%
+The best recognition rate for combining 19 learners is: 75.7576%
+The best recognition rate for combining 20 learners is: 75.7576%
+-------------------------------------------------------

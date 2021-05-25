@@ -1,0 +1,5 @@
+% FBCSP
+function extractedFeatures = CS_SpecCSP(EEGdata, base_model)
+    options = [];
+    extractedFeatures = CS_SpecCSPtrain(EEGdata, base_model, options);
+end

@@ -1,0 +1,46 @@
+
+dataset = 'competIVdatasetIIa1_2';
+extrFeatAlg = 'FBCSP';
+featSelAlg = 'none';
+F = 32;
+rootPath = '../../../02Data/';
+
+inputFiles = dir(sprintf('%s%s/trainFeatures/%s/none/*.mat', rootPath, dataset, extrFeatAlg));
+Nsubjects = length(inputFiles);
+
+for subject = 1:Nsubjects
+    %% Load trainig features
+    nameFile = sprintf('%s%s/trainFeatures/%s/none/%s', rootPath, dataset, extrFeatAlg, inputFiles(subject,1).name);
+    fprintf('Loading ''%s'' ... ', nameFile);
+    load(nameFile, 'features');
+    fprintf('done\n');  
+    trainFeatures = features;
+    
+    %% Load test features
+    nameFile = sprintf('%s%s/testFeatures/%s/none/%s', rootPath, dataset, extrFeatAlg, inputFiles(subject,1).name);
+    fprintf('Loading ''%s'' ... ', nameFile);
+    load(nameFile, 'features');
+    fprintf('done\n'); 
+    testFeatures = features;
+    
+    %% Feature selection
+    trainFeatures.data = trainFeatures.data(:,:,1:2:F);
+    testFeatures.data = testFeatures.data(:,:,1:2:F);
+    
+    %% KL Divergence    
+    KLDiv = KLDivergence(trainFeatures.data, testFeatures.data);
+    
+    %% Save
+    out_dir = sprintf('%s%s/trainFeatures/%s/%s', rootPath, dataset, extrFeatAlg, featSelAlg);
+    if exist(out_dir, 'dir') ~= 7
+        mkdir(out_dir);
+    end   
+
+    nameFile = sprintf('%s/%s', out_dir, inputFiles(subject,1).name);
+    
+    fprintf('Saving feature selection model ''%s'' ... ', nameFile);
+    save(nameFile,'subject','features','model','elapsedTime')
+    fprintf('done\n');
+    
+    fprintf('\n\n')
+end

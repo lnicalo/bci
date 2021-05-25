@@ -1,0 +1,47 @@
+path = '../../02Data/';
+dataset = 'competIVdatasetIIa';
+
+inputFiles = dir(sprintf('%s%s/eeg/*.mat', path, dataset));
+Nsubjects = length(inputFiles);
+
+for subject = 1:Nsubjects
+    %% Load EEG
+    nameFile = sprintf('%s%s/eeg/%s', path, dataset, inputFiles(subject,1).name);
+    fprintf('Loading ''%s'' ... ', nameFile);
+    load(nameFile);
+    fprintf('done\n');
+    
+    clases = unique(trueLabel(:));
+    clases = sort(clases,'descend');
+    Nclases = length(clases);
+    
+    validTrial_ = validTrial;
+    trueLabel_  = trueLabel;
+    eeg_        = eeg;
+    clear validTrial trueLabel eeg;
+    
+    Nsesiones = size(validTrial_,1);   
+    Ncanales  = size(eeg_,4);
+    Nsamples  = size(eeg_,3);
+    validTrial = NaN(Nsesiones,nTrials/2);
+    trueLabel  = NaN(Nsesiones,nTrials/2);
+    eeg        = NaN(Nsesiones,nTrials/2,Nsamples,Ncanales);
+    
+    for c = 1:Nclases
+        for d = (c+1):Nclases
+            for k = 1:Nsesiones
+                validTrial(k,:) = validTrial_(k,trueLabel_(k,:) == c | trueLabel_(k,:) == d);
+                eeg(k,:,:,:)    = eeg_(k,trueLabel_(k,:) == c | trueLabel_(k,:) == d,:,:);
+                trueLabel(k,:)  = trueLabel_(k,trueLabel_(k,:) == c | trueLabel_(k,:) == d);
+                nTrials = size(trueLabel,2);                             
+            end
+            
+            trueLabel = 1*(trueLabel == c) + 2*(trueLabel == d);
+            dir_out = sprintf('competIVdatasetIIa_%i_%i',c,d);
+            mkdir(dir_out)
+            namefile = sprintf('%s/extracted_data_subject%i',dir_out,i);
+            save(namefile,'nTrials','trueLabel','validTrial','eeg','fs');
+        end
+    end
+end
+

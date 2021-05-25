@@ -1,0 +1,18 @@
+function [accuracy, predictlabel, score] = SCpredict(fea, gnd, model)
+%     score_aux = fea * fea' * model.p;    
+%     score(:,1) = score_aux - model.u;
+%     score(:,2) = -score(:,1);
+%     [~,predictlabel] = max(score,[],2);        
+%     accuracy = mean(predictlabel == gnd');
+    A = fea * fea';
+        
+    k = 1;
+    [V, ~] = eigs(A, k);
+    model.u = median(V);
+    model.p = V;   
+    score_aux = A * model.p;    
+    score(:,1) = score_aux - model.u;
+    score(:,2) = -score(:,1);
+    [~,predictlabel] = max(score,[],2);        
+    accuracy = mean(predictlabel == gnd');
+end

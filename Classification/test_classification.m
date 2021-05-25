@@ -1,0 +1,74 @@
+%% Classification
+%% Motor imagery - BCI : Classification test
+clear
+
+dataset = 'competIVdatasetIIa';
+extrFeatAlg = 'FBCSP';
+featSelAlg = 'MIBIF';
+classificationFolder = 'AdaptEMLDA';
+optName = 'static_ss';
+perfMeas = 'all';
+
+rootPath = '../../02Data/';
+
+inputFiles = dir(sprintf('%s%s/testFeatures/%s/%s/*.mat', rootPath, dataset, extrFeatAlg, featSelAlg));
+Nsubjects = length(inputFiles);
+
+% Variable saving results
+performance = cell(1,Nsubjects);
+nameSubjects = cell(1, Nsubjects);
+for subject = 1:Nsubjects
+    %% Load features
+    nameFile = sprintf('%s%s/testFeatures/%s/%s/%s', rootPath, dataset, extrFeatAlg, featSelAlg, inputFiles(subject,1).name);
+    fprintf('Loading ''%s'' ... ', nameFile);
+    load(nameFile, 'features');
+    fprintf('done\n');
+    
+    % Print information features dataset
+    fprintf('----- Dataset %s ------\n', dataset);
+    fprintf('- Num. Trials: %d\n', size(features.data,1));
+    fprintf('- Num. Features: %i\n', size(features.data,3));
+    fprintf('----------------------------------\n\n');
+    
+    %% Load trained classification model
+    
+    nameFile = sprintf('%s%s/trainFeatures/%s/%s/%s%s/%s', rootPath, dataset, extrFeatAlg, ...
+        featSelAlg, classificationFolder, optName, inputFiles(subject,1).name);
+    load(nameFile,'model');
+    
+    %% Classification  
+    classificationAlg = model.ID;
+    if exist(classificationAlg,'file') ~= 2
+        addpath(genpath(classificationAlg));
+    end
+    
+    classificationAlg_ = str2func(classificationAlg);
+    classificationOut = classificationAlg_(features, model);
+    
+    %% Measure performance
+    if exist('perfMeasurement','file') ~= 2
+        addpath(genpath('PerfMeasurement'));
+    end    
+    perfSubject = perfMeasurement(classificationOut.labels, features.trueLabel, perfMeas);
+    nameSubjects{1, subject} = sprintf('%s', inputFiles(subject,1).name);
+        
+    %% Save results
+    performance{1, subject} = perfSubject;    
+end
+% ID - identifies feature extraction / feature selection / classification
+ID = sprintf('%s_%s_%s_%s', extrFeatAlg, featSelAlg, classificationAlg, optName);
+
+%% Save
+out_dir = sprintf('%s%s/results/', rootPath, dataset);
+if exist(out_dir, 'dir') ~= 7
+    mkdir(out_dir);
+end
+nameFile = sprintf('%s%s.mat', out_dir, ID);
+    
+fprintf('Saving performance ''%s'' ... ', nameFile);
+save(nameFile, 'ID', 'performance','nameSubjects')
+fprintf('done\n');
+
+fprintf('\n\n')
+
+perfSummaryBCIComp

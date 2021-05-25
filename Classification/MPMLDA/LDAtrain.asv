@@ -1,0 +1,41 @@
+function model = LDAtrain(fea, gnd, options)
+    ClassLabel = unique(gnd);
+    model.ClassLabel = ClassLabel;
+    nClass = length(ClassLabel);
+    
+    %% Class centers
+    ClassCenter = zeros(nClass, size(fea, 2));
+    for i = 1:nClass
+        ClassCenter(i,:) = mean(fea(gnd == ClassLabel(i),:), 1);
+    end    
+    model.ClassCenter = ClassCenter;
+    
+    %% Class covariances
+    ClassC = zeros(nClass, size(fea, 2), size(fea, 2));
+    for i = 1:nClass
+        ClassC(i,:,:) = cov(fea(gnd == ClassLabel(i),:));
+    end
+    
+    %% Pair-wise covariances
+    PairWiseC = zeros(nClass * (nClass - 1) * 0.5, size(fea, 2), size(fea, 2));
+    cont = 1;
+    for i = 1:nClass
+        for j = i+1:nClass
+            PairWiseC(cont, :,:) = 0.5 * (ClassC(i,:,:) + ClassC(j,:,:));
+            cont = cont + 1;
+        end
+    end
+    
+    %% Pair-wise vector of weights
+    PairWiseW = zeros(nClass * (nClass - 1) * 0.5, size(fea, 2), size(fea, 2));
+    cont = 1;
+    for i = 1:nClass
+        for j = i+1:nClass
+            PairWiseW(cont, :,:) = PairWiseC(cont,:,:) \ (ClassCenter(j,:) - ClassCenter(i,:));
+            cont = cont + 1;
+        end
+    end    
+    model.PairWiseW = PairWiseW;
+    
+    
+end
